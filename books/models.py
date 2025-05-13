@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 class Service(models.Model):
     STATUS_CHOICES = [
@@ -14,7 +15,8 @@ class Service(models.Model):
     width = models.CharField(max_length=10)
     route = models.CharField(max_length=100)
     category = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
+    # city = models.CharField(max_length=100)
+    city = ArrayField(models.CharField(max_length=100),blank=True,default=list)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
 
     def __str__(self):
