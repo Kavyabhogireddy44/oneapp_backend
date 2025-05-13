@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-0v(fl_v5t97hk)0mx&qq!b80ua)@-a@2e(5v4nac!$3l(m@9#(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'oneapp-backend.onrender.com']
 
 
 # Application definition
@@ -75,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'myproject.wsgi:application'
+WSGI_APPLICATION = 'myproject.wsgi.application'
 
 
 # Database
