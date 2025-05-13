@@ -103,7 +103,9 @@ DATABASES = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8100",  # Angular dev server
     "http://127.0.0.1:8000",
-    "https://oneapp-backend.onrender.com",  # Your deployed backend
+    "https://oneapp-backend.onrender.com",# Your deployed backend
+    "capacitor://localhost",              # For Capacitor Android apps (hybrid)
+    "ionic://localhost",  
     # Add your frontend domain here if it's separate
 ]
 
