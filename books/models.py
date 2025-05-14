@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import JSONField
 
 class Service(models.Model):
     STATUS_CHOICES = [
@@ -18,6 +19,7 @@ class Service(models.Model):
     # city = models.CharField(max_length=100)
     city = ArrayField(models.CharField(max_length=100),blank=True,default=list)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    className = models.JSONField(default=dict)
 
     def __str__(self):
         return self.title
