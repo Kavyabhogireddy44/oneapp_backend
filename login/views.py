@@ -1,0 +1,33 @@
+from django.shortcuts import render
+# login/views.py
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from user.models import CustomUser
+from .utils import create_jwt, verify_jwt
+
+class CreateTokenAPIView(APIView):
+    def post(self, request):
+        phone = request.data.get('phone')
+        if not phone:
+            return Response({'error': 'Phone number is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(phone=phone)
+            token = create_jwt(user.id, user.phone)
+            return Response({'token': token}, status=status.HTTP_200_OK)
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+class VerifyTokenAPIView(APIView):
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        decoded = verify_jwt(token)
+        if decoded:
+            return Response({'valid': True, 'data': decoded}, status=status.HTTP_200_OK)
+        else:
+            return Response({'valid': False}, status=status.HTTP_401_UNAUTHORIZED)
+
