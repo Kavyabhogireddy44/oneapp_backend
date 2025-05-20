@@ -55,6 +55,8 @@ class UserOrdersByTokenAPIView(APIView):
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+
 class OrderByTokenAPIView(APIView):
     def get_user_from_token(self, token):
         if not token:
@@ -71,33 +73,30 @@ class OrderByTokenAPIView(APIView):
         except CustomUser.DoesNotExist:
             return None, Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    def post(self, request):
-        """Retrieve all orders by token."""
+    def post(self, request, order_id):
+        """Retrieve a specific order using POST (to allow token in body)"""
         token = request.data.get('token')
-        user, error = self.get_user_from_token(token)
-        if error:
-            return error
-
-        orders = Order.objects.filter(user=user)
-        if not orders.exists():
-            return Response({'message': 'No orders found for this user'}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request):
-        """
-        Update an order by ID (if it belongs to the user).
-        Requires: token and order_id in body.
-        """
-        token = request.data.get('token')
-        order_id = request.data.get('order_id')
         user, error = self.get_user_from_token(token)
         if error:
             return error
 
         try:
-            order = Order.objects.get(id=order_id, user=user)
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return Response({'error': 'Order not found for this user'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, order_id):
+        """Update order"""
+        token = request.data.get('token')
+        user, error = self.get_user_from_token(token)
+        if error:
+            return error
+
+        try:
+            order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
             return Response({'error': 'Order not found for this user'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -107,19 +106,15 @@ class OrderByTokenAPIView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request):
-        """
-        Delete an order by ID (if it belongs to the user).
-        Requires: token and order_id in body.
-        """
+    def delete(self, request, order_id):
+        """Delete order"""
         token = request.data.get('token')
-        order_id = request.data.get('order_id')
         user, error = self.get_user_from_token(token)
         if error:
             return error
 
         try:
-            order = Order.objects.get(id=order_id, user=user)
+            order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
             return Response({'error': 'Order not found for this user'}, status=status.HTTP_404_NOT_FOUND)
 
