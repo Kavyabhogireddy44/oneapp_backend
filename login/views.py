@@ -26,8 +26,18 @@ class VerifyTokenAPIView(APIView):
             return Response({'error': 'Token is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         decoded = verify_jwt(token)
-        if decoded:
-            return Response({'valid': True, 'data': decoded}, status=status.HTTP_200_OK)
-        else:
-            return Response({'valid': False}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not decoded:
+            return Response({'valid': False, 'error': 'Invalid or expired token.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user_id = decoded.get('user_id')
+        if not user_id:
+            return Response({'valid': False, 'error': 'Token does not contain user_id.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return Response({'valid': False, 'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'valid': True, 'data': decoded}, status=status.HTTP_200_OK)
 

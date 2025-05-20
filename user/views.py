@@ -94,6 +94,7 @@ class UserByTokenAPIView(APIView):
         """Delete user by token."""
         token = request.data.get('token')
         user, error = self.get_user_from_token(token)
+        print("user", user)
         if error:
             return error
 

@@ -3,6 +3,6 @@ from .views import OrderListCreateAPIView ,OrderByTokenAPIView,UserOrdersByToken
 
 urlpatterns = [
     path('', OrderListCreateAPIView.as_view(), name='order-list-create'),
-    path('orders/by-token//', OrderByTokenAPIView.as_view(), name='order-detail'),
+    path('orders/by-token/', OrderByTokenAPIView.as_view(), name='order-detail'),
     path('user-orders/', UserOrdersByTokenAPIView.as_view(), name='user-orders'),
 ]
