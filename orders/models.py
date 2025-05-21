@@ -5,6 +5,7 @@ from user.models import CustomUser
 
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='orders')
+    token=models.CharField(max_length=200)
     service_name = models.CharField(max_length=255)
     category = models.CharField(max_length=100)
     service_image = models.URLField(max_length=500, blank=True, null=True)

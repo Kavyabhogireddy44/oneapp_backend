@@ -16,9 +16,9 @@ class Address(models.Model):
     landmark=models.CharField(max_length=200)
     label=models.CharField(max_length=200,choices=LABEL_CHOICES)
     house_no=models.CharField(max_length=200)
-    building_name=models.CharField(max_length=200)
-    receiver_name=models.CharField(max_length=200)
-    conatact=models.CharField(max_length=200)
+    building_name=models.CharField(max_length=200,blank=True, null=True)
+    receiver_name=models.CharField(max_length=200,blank=True, null=True)
+    receiver_contact=models.CharField(max_length=200,blank=True, null=True)
 
     def __str__(self):
         return self.address
