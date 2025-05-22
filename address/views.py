@@ -30,11 +30,11 @@ class AddressListCreateAPIview(generics.ListCreateAPIView):
         if error:
             return error
 
-        Address = Address.objects.all()
-        if not Address.exists():
+        address = Address.objects.all()
+        if not address.exists():
             return Response({'message': 'No orders found for this user'}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = AddressSerializer(Address, many=True)
+        serializer = AddressSerializer(address, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
