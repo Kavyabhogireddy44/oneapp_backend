@@ -27,4 +27,5 @@ urlpatterns = [
     path('api/favourites/', include('favourites.urls')),
     path('api/login/', include('login.urls')),
     path('api/address/', include('address.urls')),
+    path('api/suggestions/', include('suggestions.urls')),
 ]

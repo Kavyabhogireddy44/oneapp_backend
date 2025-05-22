@@ -9,7 +9,9 @@ class Address(models.Model):
         ('school','SCHOOL'),
         ('other','OTHER')
     ]
-    user=models.ForeignKey(CustomUser,on_delete=models.CASCADE,related_name='address')
+
+    # token=models.CharField(max_length=200)
+    user=models.ForeignKey(CustomUser,on_delete=models.CASCADE,related_name='address',blank=True)
     lat=models.CharField(max_length=200)
     lng=models.CharField(max_length=200)
     address=models.CharField(max_length=200)
