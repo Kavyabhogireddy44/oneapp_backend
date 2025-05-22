@@ -30,7 +30,7 @@ class AddressListCreateAPIview(generics.ListCreateAPIView):
         if error:
             return error
 
-        address = Address.objects.filter(user=user_id)
+        address = Address.objects.filter(user=user)
         if not address.exists():
             return Response({'message': 'No orders found for this user'}, status=status.HTTP_404_NOT_FOUND)
 
