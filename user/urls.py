@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserListCreateAPIView, CheckPhoneNumberAPIView, UserByTokenAPIView,UserDestroyAPIView, UserUpdateAPIView
+from .views import UserListCreateAPIView, CheckPhoneNumberAPIView, UserByTokenAPIView,DeleteUserByTokenAPIView
 
 urlpatterns = [
     path('', UserListCreateAPIView.as_view(), name='user-list-create'),
@@ -8,4 +8,6 @@ urlpatterns = [
     path('check-phone/', CheckPhoneNumberAPIView.as_view(), name='check-phone'),
     # path('user-by-token/', UserByTokenAPIView.as_view(), name='user-by-token'),
     path('user-by-token/', UserByTokenAPIView.as_view(), name='user-by-token'),
+    path('delete-user/', DeleteUserByTokenAPIView.as_view(), name='delete-user-by-token'),
+
 ]

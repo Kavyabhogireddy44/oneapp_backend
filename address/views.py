@@ -78,7 +78,7 @@ class AddressByTokenAPIView(APIView):
         except CustomUser.DoesNotExist:
             return None, Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    def post(self, request, Address_id):
+    def post(self, request, pk):
         """Retrieve a specific order using POST (to allow token in body)"""
         token = request.data.get('token')
         user, error = self.get_user_from_token(token)
@@ -86,14 +86,14 @@ class AddressByTokenAPIView(APIView):
             return error
 
         try:
-            Address = Address.objects.get(id=Address_id)
+            address = Address.objects.get(id=pk,user=user)
         except Address.DoesNotExist:
             return Response({'error': 'Address not found for this user'}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = AddressSerializer(Address)
+        serializer = AddressSerializer(address)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, Address_id):
+    def put(self, request, pk):
         """Update order"""
         token = request.data.get('token')
         user, error = self.get_user_from_token(token)
@@ -101,31 +101,100 @@ class AddressByTokenAPIView(APIView):
             return error
 
         try:
-            Address = Address.objects.get(id=Address_id)
+            address = Address.objects.get(id=pk,user=user)
+            print("address", address)
         except Address.DoesNotExist:
             return Response({'error': 'Order not found for this user'}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = AddressSerializer(Address, data=request.data, partial=True)
+        serializer = AddressSerializer(address, data=request.data, partial=True)
+        print("serializer", serializer)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, Address_id):
-        """Delete order"""
+
+class AddressListByTokenAPIView(APIView):
+    def post(self, request):
         token = request.data.get('token')
-        user, error = self.get_user_from_token(token)
-        if error:
-            return error
+        if not token:
+            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        payload = verify_jwt(token)
+        print("payload", payload)
+        if not payload:
+            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        user_id = payload.get('user_id')
+        print("user_id", user_id)
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            user=user.id
+            print("user", user)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        address = Address.objects.all()
+        print("orders", address)
+        if not address.exists():
+            return Response({'message': 'No orders found for this user'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = AddressSerializer(address, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+# Create your views here.
+class UserAddressByTokenAPIView(APIView):
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        payload = verify_jwt(token)
+        print("payload", payload)
+        if not payload:
+            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        user_id = payload.get('user_id')
+        print("user_id", user_id)
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            user=user.id
+            print("user", user)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        address = Address.objects.filter(user=user)
+        print("orders", address)
+        if not address.exists():
+            return Response({'message': 'No orders found for this user'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = AddressSerializer(address, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class DeleteAddressByTokenAPIView(APIView):
+    def post(self, request, pk):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        payload = verify_jwt(token)
+        print("payload", payload)
+        if not payload:
+            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        user_id = payload.get('user_id')
+        print("user_id", user_id)
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            user=user.id
+            print("user", user)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            Address = Address.objects.get(id=Address_id)
+            address = Address.objects.get(id=pk,user=user)
+            print("address", address)
         except Address.DoesNotExist:
             return Response({'error': 'Address not found for this user'}, status=status.HTTP_404_NOT_FOUND)
 
-        Address.delete()
+        address.delete()
         return Response({'message': 'Address deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-
-
-
-# Create your views here.

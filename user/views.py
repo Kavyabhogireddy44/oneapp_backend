@@ -90,13 +90,32 @@ class UserByTokenAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request):
-        """Delete user by token."""
+class DeleteUserByTokenAPIView(APIView):
+    def post(self, request):
         token = request.data.get('token')
-        user, error = self.get_user_from_token(token)
-        print("user", user)
-        if error:
-            return error
+        if not token:
+            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        payload = verify_jwt(token)
+        print("payload", payload)
+        if not payload:
+            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        user_id = payload.get('user_id')
+        print("user_id", user_id)
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            user=user.id
+            print("user", user)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except user.DoesNotExist:
+            return Response({'error': 'user not found for this user'}, status=status.HTTP_404_NOT_FOUND)
 
         user.delete()
-        return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'message': 'user deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+    
+
