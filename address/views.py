@@ -165,7 +165,7 @@ class UserAddressByTokenAPIView(APIView):
         address = Address.objects.filter(user=user)
         print("orders", address)
         if not address.exists():
-            return Response({[]}, status=status.HTTP_404_NOT_FOUND)
+            return Response([],status=status.HTTP_204_NO_CONTENT)
         serializer = AddressSerializer(address, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
