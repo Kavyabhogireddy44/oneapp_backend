@@ -28,4 +28,6 @@ urlpatterns = [
     path('api/login/', include('login.urls')),
     path('api/address/', include('address.urls')),
     path('api/suggestions/', include('suggestions.urls')),
+    path('api/banner/', include('banner.urls')),
+    path('api/metadata/', include('metadata.urls')),
 ]
