@@ -30,4 +30,6 @@ urlpatterns = [
     path('api/suggestions/', include('suggestions.urls')),
     path('api/banner/', include('banner.urls')),
     path('api/metadata/', include('metadata.urls')),
+    path('api/event/', include('event.urls')),
+    
 ]

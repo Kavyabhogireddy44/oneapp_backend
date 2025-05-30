@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'suggestions',
     'banner',
     'metadata',
+    'event', 
 ]
 
 MIDDLEWARE = [

@@ -10,6 +10,11 @@ class CustomUser(models.Model):
     is_active = models.BooleanField(default=True)
     is_verified = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
+    role = models.CharField(max_length=50, choices=[
+        ('user', 'User'),
+        ('provider', 'Service Provider'),
+        ('admin', 'Admin')
+    ], default='user')
 
     def __str__(self):
         return self.username

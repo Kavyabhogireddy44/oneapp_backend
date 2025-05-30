@@ -15,7 +15,7 @@ class CreateTokenAPIView(APIView):
         try:
             user = CustomUser.objects.get(phone=phone)
             print("user",user)
-            token = create_jwt(user.id, user.phone,user.first_name)
+            token = create_jwt(user.id, user.phone,user.first_name,user.role)
             return Response({'token': token}, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
             return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
