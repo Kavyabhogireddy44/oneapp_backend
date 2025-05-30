@@ -24,18 +24,18 @@ class EventListCreateAPIView(generics.ListCreateAPIView):
         except CustomUser.DoesNotExist:
             return None, Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    # def get(self, request):
-    #     token = request.data.get('token')  # Token in body
-    #     user, error = self.get_user_from_token(token)
-    #     if error:
-    #         return error
+    def get(self, request):
+        token = request.data.get('token')  # Token in body
+        user, error = self.get_user_from_token(token)
+        if error:
+            return error
 
-    #     events = Event.objects.all()
-    #     if not events.exists():
-    #         return Response({'message': 'No orders found for this user'}, status=status.HTTP_404_NOT_FOUND)
+        events = Event.objects.all()
+        if not events.exists():
+            return Response({'message': 'No orders found for this user'}, status=status.HTTP_404_NOT_FOUND)
 
-    #     serializer = EventSerializer(user, many=True)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = EventSerializer(user, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         token = request.data.get('token')
@@ -105,7 +105,7 @@ class EventsListByTokenAPIView(APIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
         events = Event.objects.all()
-        if not Event.exists():
+        if not events.exists():
             return Response({'message': 'Events found for this user'}, status=status.HTTP_404_NOT_FOUND)
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -175,29 +175,24 @@ class DeleteEventsByTokenAPIView(APIView):
             return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         payload = verify_jwt(token)
-        print("payload", payload)
         if not payload:
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
         
         user_id = payload.get('user_id')
-        print("user_id", user_id)
         try:
             user = CustomUser.objects.get(id=user_id)
-            user=user.id
-            print("user", user)
         except CustomUser.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            event = Event.objects.get(id=pk,user=user)
+            event = Event.objects.get(id=pk)
+            if user.role.lower() == 'admin':
+                event.delete()
+                return Response({'message': 'Event deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({'error': 'You don\'t have permission to delete'}, status=status.HTTP_403_FORBIDDEN)
         except Event.DoesNotExist:
-            return Response({'error': 'Address not found for this user'}, status=status.HTTP_404_NOT_FOUND)
-        if user.role == 'admin' or user.role == 'ADMIN':
-            Event.delete()
-            return Response({'message': 'Event  deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response({'error':'You Dont have Permission to Delete','status':status.HTTP_403_FORBIDDEN})
-
+            return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 # Create your views here.
