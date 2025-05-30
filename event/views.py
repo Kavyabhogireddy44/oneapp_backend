@@ -163,27 +163,40 @@ class EventRetrieveUpdateAPIView(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    def delete(self, request,pk):
-        """Delete order"""
-        token = request.data.get('token')
-        user, error = self.get_user_from_token(token)
-        if error:
-            return error
-
-        try:
-            event = Event.objects.get(id=pk)
-        except Event.DoesNotExist:
-            return Response({'error': 'Event not found for this user'}, status=status.HTTP_404_NOT_FOUND)
-        if user.role== 'admin' or user.role == 'ADMIN':
-            return Response({'error':'You Dont have Permission to Delete','status':status.HTTP_403_FORBIDDEN})
-        Event.delete()
-        return Response({'message': 'Event  deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
 
 
 
 
+class DeleteEventsByTokenAPIView(APIView):
+    def post(self, request, pk):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        payload = verify_jwt(token)
+        print("payload", payload)
+        if not payload:
+            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        user_id = payload.get('user_id')
+        print("user_id", user_id)
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            user=user.id
+            print("user", user)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
+        try:
+            event = Event.objects.get(id=pk,user=user)
+        except Event.DoesNotExist:
+            return Response({'error': 'Address not found for this user'}, status=status.HTTP_404_NOT_FOUND)
+        if user.role == 'admin' or user.role == 'ADMIN':
+            Event.delete()
+            return Response({'message': 'Event  deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'error':'You Dont have Permission to Delete','status':status.HTTP_403_FORBIDDEN})
 
 
 
