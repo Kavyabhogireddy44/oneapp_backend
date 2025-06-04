@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import ArrayField
 # Create your models here.
 class AreaPolygon(models.Model):
     center = models.JSONField()
-    polygon = models.JSONField()
+    polygon = models.JSONField(null=True, blank=True)
     inside_color = models.CharField()
     border_color = models.CharField()
 
