@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'banner',
     'metadata',
     'event', 
+    'polygon'
 ]
 
 MIDDLEWARE = [

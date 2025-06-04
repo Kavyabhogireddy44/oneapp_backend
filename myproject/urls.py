@@ -31,5 +31,7 @@ urlpatterns = [
     path('api/banner/', include('banner.urls')),
     path('api/metadata/', include('metadata.urls')),
     path('api/event/', include('event.urls')),
+    path('api/polygon/', include('polygon.urls')),
+
     
 ]
