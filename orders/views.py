@@ -101,6 +101,32 @@ class UserOrdersByTokenAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class OrdersByTokenAPIView(APIView):
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        payload = verify_jwt(token)
+        print("payload", payload)
+        if not payload:
+            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        user_id = payload.get('user_id')
+        print("user_id", user_id)
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            user=user.id
+            print("user", user)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        orders = Order.objects.all()
+        print("orders", orders)
+        if not orders.exists():
+            return Response({'message': 'No orders found for this user'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class OrderByTokenAPIView(APIView):
     def get_user_from_token(self, token):
