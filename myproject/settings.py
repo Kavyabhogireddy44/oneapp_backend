@@ -105,7 +105,9 @@ DATABASES = {
     'default': dj_database_url.parse(
         os.environ.get(
             'DATABASE_URL',
-            'postgresql://oneapp_backend_user:lRF8egH9V09oUW7pFPImZMEePuz8EAtk@dpg-d0e9ajp5pdvs73asvsdg-a.singapore-postgres.render.com/oneapp_backend'
+            # 'postgresql://oneapp_backend_user:lRF8egH9V09oUW7pFPImZMEePuz8EAtk@dpg-d0e9ajp5pdvs73asvsdg-a.singapore-postgres.render.com/oneapp_backend'
+            # 'postgresql://postgres:Reddy%402000@db.wgqewjwseyqkesydzqas.supabase.co:5432/postgres?sslmode=require'
+            'postgresql://neondb_owner:npg_o79MFwUCWVhg@ep-still-sunset-a8uihvoy-pooler.eastus2.azure.neon.tech/neondb?sslmode=require'
         )
     )
 }
