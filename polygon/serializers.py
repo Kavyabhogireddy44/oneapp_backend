@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import AreaPolygon
+from .models import Polygon
 
 
 class AreaPolygonSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AreaPolygon
+        model = Polygon
         fields = '__all__'
