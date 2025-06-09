@@ -32,6 +32,8 @@ urlpatterns = [
     path('api/metadata/', include('metadata.urls')),
     path('api/event/', include('event.urls')),
     path('api/polygon/', include('polygon.urls')),
+    path('api/adminuser/', include('AdminUser.urls')),
+    path('api/adminuserlogin/', include('AdminUserLogin.urls')),
 
     
 ]

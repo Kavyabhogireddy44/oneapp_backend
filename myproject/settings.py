@@ -52,7 +52,9 @@ INSTALLED_APPS = [
     'banner',
     'metadata',
     'event', 
-    'polygon'
+    'polygon',
+    'AdminUser',
+    'AdminUserLogin',  # Ensure this app is included
 ]
 
 MIDDLEWARE = [

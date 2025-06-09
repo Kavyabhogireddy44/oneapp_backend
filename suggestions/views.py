@@ -120,6 +120,7 @@ class SuggestionByTokenAPIView(APIView):
         return Response({'message': 'Address deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
 class UserSuggestionByTokenAPIView(APIView):
+    
     def post(self, request):
         token = request.data.get('token')
         if not token:
