@@ -139,7 +139,7 @@ class UserSuggestionByTokenAPIView(APIView):
         except CustomUser.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        suggestion = Suggestion.objects.filter(user=user)
+        suggestion = Suggestion.objects.all()
   
         if not suggestion.exists():
             return Response({'message': 'No suggestions found for this user'}, status=status.HTTP_404_NOT_FOUND)
