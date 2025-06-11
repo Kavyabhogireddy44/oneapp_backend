@@ -1,27 +1,30 @@
 from django.shortcuts import render
 from rest_framework import generics
 from .models import Event
+from AdminUser.models import AdminUser
 from .serializers import EventSerializer
 from user.models import CustomUser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from AdminUserLogin.utils import create_admin_jwt, verify_admin_jwt
 from login.utils import verify_jwt
 
 class EventListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = EventSerializer
     def get_user_from_token(self, token):
-        payload = verify_jwt(token)
+        payload = verify_admin_jwt(token)
+        print("payload", payload)
         if not payload:
             return None, Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
         user_id= payload.get('user_id')
         role_id = payload.get('role')
         print("role_id", role_id)
         try:
-            user = CustomUser.objects.get(role=role_id,id=user_id)
+            user = AdminUser.objects.get(role=role_id,id=user_id)
             print("user", user)
             return user, None
-        except CustomUser.DoesNotExist:
+        except AdminUser.DoesNotExist:
             return None, Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request):
@@ -71,10 +74,10 @@ class EventsByTokenAPIView(APIView):
         user_id = payload.get('user_id')
         print("user_id", user_id)
         try:
-            user = CustomUser.objects.get(id=user_id)
+            user = AdminUser.objects.get(id=user_id)
             user=user.id
             print("user", user)
-        except CustomUser.DoesNotExist:
+        except AdminUser.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
         events = Event.objects.filter(user=user)
@@ -98,7 +101,7 @@ class EventsListByTokenAPIView(APIView):
         user_id = payload.get('user_id')
         print("user_id", user_id)
         try:
-            user = CustomUser.objects.get(id=user_id)
+            user = CustomUser.objects.get(id=user_id) or AdminUser.objects.get(id=user_id)
             user=user.id
             print("user", user)
         except CustomUser.DoesNotExist:
@@ -120,26 +123,11 @@ class EventRetrieveUpdateAPIView(APIView):
         role_id = payload.get('role')
         print("role_id", role_id)
         try:
-            user = CustomUser.objects.get(role=role_id,id=user_id)
+            user = AdminUser.objects.get(role=role_id,id=user_id)
             print("user", user)
             return user, None
-        except CustomUser.DoesNotExist:
+        except AdminUser.DoesNotExist:
             return None, Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    def post(self, request,pk):
-        """Retrieve user by token."""
-        token = request.data.get('token')
-        user, error = self.get_user_from_token(token)
-        if error:
-            return error
-
-        try:
-            event = Event.objects.get(id=pk)
-        except Event.DoesNotExist:
-            return Response({'error': 'Event not found for this user'}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = EventSerializer(event)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request,pk):
         """Update user by token."""
@@ -155,7 +143,8 @@ class EventRetrieveUpdateAPIView(APIView):
             return Response({'error': 'evens not found for this user'}, status=status.HTTP_404_NOT_FOUND)
         role_id = user.role
         print("role_id", role_id)
-        if role_id != 'admin' or 'ADMIN':
+        print("type(role_id)", type(role_id))
+        if role_id.lower() != 'admin':
             return Response({'error': 'You Dont have Permission to Modify'}, status=status.HTTP_403_FORBIDDEN)
         else:
             serializer = EventSerializer(event, data=request.data, partial=True)
@@ -180,8 +169,8 @@ class DeleteEventsByTokenAPIView(APIView):
         
         user_id = payload.get('user_id')
         try:
-            user = CustomUser.objects.get(id=user_id)
-        except CustomUser.DoesNotExist:
+            user = AdminUser.objects.get(id=user_id)
+        except AdminUser.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
         try:

@@ -11,7 +11,6 @@ class AdminUser(models.Model):
     is_verified = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     role = models.CharField(max_length=50, choices=[
-        ('user', 'User'),
         ('vender', 'Vender'),
         ('admin', 'Admin'),
         ('editor', 'Editor'),
