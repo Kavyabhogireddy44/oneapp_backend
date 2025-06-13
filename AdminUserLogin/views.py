@@ -20,7 +20,7 @@ class CreateTokenAPIView(APIView):
 
         try:
             print("request.data.get('password')", request.data.get('password'))
-            user = AdminUser.objects.get(phone=user_name,password=request.data.get('password'))
+            user = AdminUser.objects.get(phone=user_name,password_field=request.data.get('password'))
             print("user", user)
             if not user.is_active:
                 return Response({'error': 'User is not active.'}, status=status.HTTP_403_FORBIDDEN)
