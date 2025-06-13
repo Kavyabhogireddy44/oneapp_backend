@@ -103,7 +103,6 @@ class EventsListByTokenAPIView(APIView):
         try:
             # user = CustomUser.objects.get(id=user_id) or AdminUser.objects.get(id=user_id)
             user = CustomUser.objects.all()
-            user=user.id
             print("user", user)
         except CustomUser.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
