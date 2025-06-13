@@ -101,7 +101,8 @@ class EventsListByTokenAPIView(APIView):
         user_id = payload.get('user_id')
         print("user_id", user_id)
         try:
-            user = CustomUser.objects.get(id=user_id) or AdminUser.objects.get(id=user_id)
+            # user = CustomUser.objects.get(id=user_id) or AdminUser.objects.get(id=user_id)
+            user = CustomUser.objects.all()
             user=user.id
             print("user", user)
         except CustomUser.DoesNotExist:
