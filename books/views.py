@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 from rest_framework import generics, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from books.models import Service
 from books.serializers import ServiceSerializer
@@ -54,3 +55,14 @@ class ActiveServiceListAPIView(generics.ListAPIView):
 class ServiceRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+
+class ServicesCountAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        active_count = Service.objects.filter(status="active").count()
+        inactive_count = Service.objects.filter(status="inactive").count()
+        coming_soon_count = Service.objects.filter(status="coming_soon").count()
+        return Response([
+            ["Available", active_count],
+            ["Inactive", inactive_count],
+            ["Coming Soon", coming_soon_count]
+        ], status=status.HTTP_200_OK)

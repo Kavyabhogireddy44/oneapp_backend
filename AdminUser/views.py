@@ -115,7 +115,6 @@ class AdminDetailAPIView(APIView):
         role_id = user.role
         user_id = user.id
         print("user_id", user_id)
-        
         if error:
             return error
         try:
@@ -144,7 +143,6 @@ class AdminDeleteAPIView(APIView):
         payload = verify_admin_jwt(token)
         if not payload:
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
-        
         user_id = payload.get('user_id')
         role_id = payload.get('role')
         try:
@@ -154,7 +152,6 @@ class AdminDeleteAPIView(APIView):
 
         try:
             event = AdminUser.objects.get(id=pk)
-
             if role_id.lower() == 'admin':
                 event.delete()
                 return Response({'message': 'user deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
