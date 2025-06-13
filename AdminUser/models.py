@@ -22,7 +22,7 @@ class AdminUser(models.Model):
         ('moderator', 'Moderator'),
         ('guest', 'Guest'),
     ], default='user')
-    password = models.CharField(max_length=138)  # Store hashed password
+    password_field = models.CharField(max_length=138)  # Store hashed password
 
     def __str__(self):
         return self.phone
