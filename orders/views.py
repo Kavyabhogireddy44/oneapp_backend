@@ -218,13 +218,13 @@ class OrderByTokenAPIView(APIView):
 #         serializer = OrderSerializer(orders, many=True)
 #         return Response(serializer.data, status=status.HTTP_200_OK)
 class OrdersScheduledAPIView(APIView):
-    def post(self, request):
+    def get(self, request):
         
         # Get today’s date
         today = datetime.now().date()
 
         # Filter orders for today
-        orders = Order.objects.filter(user=user, created_at__date=today)
+        orders = Order.objects.filter(created_at__date=today)
         if not orders.exists():
             return Response({'message': 'No orders found for this user today'}, status=status.HTTP_404_NOT_FOUND)
 
