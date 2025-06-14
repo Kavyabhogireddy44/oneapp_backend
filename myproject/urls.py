@@ -34,6 +34,7 @@ urlpatterns = [
     path('api/polygon/', include('polygon.urls')),
     path('api/adminuser/', include('AdminUser.urls')),
     path('api/adminuserlogin/', include('AdminUserLogin.urls')),
+    path('api/grocery/', include('grocery.urls')),
 
     
 ]

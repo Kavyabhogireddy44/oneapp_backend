@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'event', 
     'polygon',
     'AdminUser',
-    'AdminUserLogin',  # Ensure this app is included
+    'AdminUserLogin',  
+    'grocery',
 ]
 
 MIDDLEWARE = [
