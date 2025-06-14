@@ -219,19 +219,6 @@ class OrderByTokenAPIView(APIView):
 #         return Response(serializer.data, status=status.HTTP_200_OK)
 class OrdersScheduledAPIView(APIView):
     def post(self, request):
-        token = request.data.get('token')
-        if not token:
-            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        payload = verify_jwt(token)
-        if not payload:
-            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
-        
-        user_id = payload.get('user_id')
-        try:
-            user = CustomUser.objects.get(id=user_id)
-        except CustomUser.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         
         # Get today’s date
         today = datetime.now().date()
