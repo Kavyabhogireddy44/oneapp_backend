@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'AdminUser',
     'AdminUserLogin',  
     'grocery',
+    'cart',
+    'cart.mixins',  # Ensure this is included if you have mixins in the
 ]
 
 MIDDLEWARE = [
