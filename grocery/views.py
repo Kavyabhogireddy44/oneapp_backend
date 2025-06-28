@@ -51,24 +51,24 @@ class GroceryCreateAPIView(GenericAPIView):
     
 class GroceryListAPIView(APIView):
     def post(self, request):
-        token = request.data.get('token')
-        if not token:
-            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        # token = request.data.get('token')
+        # if not token:
+        #     return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        payload = verify_admin_jwt(token)
-        print("payload", payload)
-        if not payload:
-            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+        # payload = verify_admin_jwt(token)
+        # print("payload", payload)
+        # if not payload:
+        #     return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
         
-        user_id = payload.get('user_id')
-        role_id = payload.get('role')
-        print("user_id", user_id)
-        try:
-            user = AdminUser.objects.get(id=user_id) 
-            user=user.id
-            print("user", user)
-        except AdminUser.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        # user_id = payload.get('user_id')
+        # role_id = payload.get('role')
+        # print("user_id", user_id)
+        # try:
+        #     user = AdminUser.objects.get(id=user_id) 
+        #     user=user.id
+        #     print("user", user)
+        # except AdminUser.DoesNotExist:
+        #     return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
         grocerylist = GroceryItem.objects.all()
         if not grocerylist.exists():
