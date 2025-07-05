@@ -93,8 +93,11 @@ class UpdateCartItemAPIView(APIView, GetUserFromTokenMixin):
             if cart_item_id:
                 try:
                     cart_item = CartItem.objects.get(id=cart_item_id, cart=cart, item=grocery_item)
-                    cart_item.quantity = quantity
-                    cart_item.save()
+                    if quantity == 0:
+                        cart_item.delete()
+                    else:
+                        cart_item.quantity = quantity
+                        cart_item.save()
                 except CartItem.DoesNotExist:
                     return Response({'error': f"Cart item with ID {cart_item_id} not found for this user."}, status=404)
             else:
