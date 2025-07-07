@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Cart
-from .serializers import CartSerializer
+from .serializers import CartSerializer, CartItemSerializer
 from login.utils import verify_jwt  # assuming you're using JWT
 from cart.mixins import GetUserFromTokenMixin  # Adjust path as needed
 from grocery.models import GroceryItem
@@ -60,8 +60,15 @@ class ViewCartAPIView(APIView, GetUserFromTokenMixin):
         if error:
             return error
 
-        cart_items = Cart.objects.filter(user=user)
-        serializer = CartSerializer(cart_items, many=True)
+        # Get user's cart
+        cart = Cart.objects.filter(user=user).first()
+        if not cart:
+            return Response([], status=200)
+
+        # Get only items with quantity > 0
+        cart_items = cart.items.filter(quantity__gt=0)
+
+        serializer = CartItemSerializer(cart_items, many=True)  # Use CartItemSerializer, not CartSerializer
         return Response(serializer.data, status=200)
 class UpdateCartItemAPIView(APIView, GetUserFromTokenMixin):
     """

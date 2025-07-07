@@ -4,4 +4,5 @@ from .views import MetadataListCreateAPIView, MetadataRetrieveUpdateDestroyAPIVi
 urlpatterns = [
     path('', MetadataListCreateAPIView.as_view(), name='metadata-list-create'),
     path('<int:pk>/', MetadataRetrieveUpdateDestroyAPIView.as_view(), name='metadata-detail'),
+    # path('otp-auth/', otp_auth, name='otp-auth'),
 ]
