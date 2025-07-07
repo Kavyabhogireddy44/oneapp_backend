@@ -39,6 +39,10 @@ class GroceryItem(models.Model):
     discount = models.JSONField(default=dict)  # e.g., {"amount": 0.5, "type": "flat", "valid_until": "2025-06-30"}
     stock = models.PositiveIntegerField(default=0)
     image_url = models.URLField(max_length=500, blank=True, null=True)
+    category_image = models.URLField(max_length=500, blank=True, null=True)  # Optional image for the category
+    # category_tag make array or list
+
+    category_tag = models.JSONField(default=list)  # e.g., ["fruits", "snacks", "healthy"]
     is_available = models.BooleanField(default=True)
     rating = models.FloatField(default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)

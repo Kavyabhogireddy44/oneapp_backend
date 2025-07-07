@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Cart
-from .serializers import CartSerializer, CartItemSerializer
+from .serializers import CartSerializer,CartItemSerializer
 from login.utils import verify_jwt  # assuming you're using JWT
 from cart.mixins import GetUserFromTokenMixin  # Adjust path as needed
 from grocery.models import GroceryItem
@@ -22,33 +22,8 @@ class CreateCartView(APIView, GetUserFromTokenMixin):
         # cart = Cart.objects.create(user=user)
         cart, created = Cart.objects.get_or_create(user=user)
 
-        # Get the items from the request
-        # items_data = request.data.get('items', [])
-
-        # # Loop and create CartItems
-        # for item_data in items_data:
-        #     item_id = item_data.get('grocery_item')
-        #     quantity = item_data.get('quantity', 1)
-
-        #     try:
-        #         grocery_item = GroceryItem.objects.get(id=item_id)
-
-        #         # Check if available
-        #         if grocery_item.is_available and grocery_item.stock >= quantity:
-        #             CartItem.objects.create(cart=cart, item=grocery_item, quantity=quantity)
-        #         else:
-        #             return Response({
-        #                 'error': f'Item "{grocery_item.name}" is unavailable or out of stock.'
-        #             }, status=status.HTTP_400_BAD_REQUEST)
-
-        #     except GroceryItem.DoesNotExist:
-        #         return Response({'error': f'Grocery item with id {item_id} not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-        # # Serialize the cart and return
-        # serializer = CartSerializer(cart)  # Make sure your serializer includes items
-        # return Response(serializer.data, status=status.HTTP_201_CREATED)
         serializer = CartSerializer(cart)  # Ensure CartSerializer includes related CartItems
-        return Response({serializer.data}, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 
@@ -60,16 +35,18 @@ class ViewCartAPIView(APIView, GetUserFromTokenMixin):
         if error:
             return error
 
-        # Get user's cart
-        cart = Cart.objects.filter(user=user).first()
-        if not cart:
-            return Response([], status=200)
+        carts = Cart.objects.filter(user=user)
 
-        # Get only items with quantity > 0
-        cart_items = cart.items.filter(quantity__gt=0)
+        # Filter cart items in memory
+        filtered_data = []
+        for cart in carts:
+            items = cart.items.filter(quantity__gt=0)
+            if items.exists():
+                cart_data = CartSerializer(cart).data
+                cart_data['items'] = CartItemSerializer(items, many=True).data
+                filtered_data.append(cart_data)
 
-        serializer = CartItemSerializer(cart_items, many=True)  # Use CartItemSerializer, not CartSerializer
-        return Response(serializer.data, status=200)
+        return Response(filtered_data, status=200)
 class UpdateCartItemAPIView(APIView, GetUserFromTokenMixin):
     """
     Updates quantity for a cart item.
@@ -100,11 +77,8 @@ class UpdateCartItemAPIView(APIView, GetUserFromTokenMixin):
             if cart_item_id:
                 try:
                     cart_item = CartItem.objects.get(id=cart_item_id, cart=cart, item=grocery_item)
-                    if quantity == 0:
-                        cart_item.delete()
-                    else:
-                        cart_item.quantity = quantity
-                        cart_item.save()
+                    cart_item.quantity = quantity
+                    cart_item.save()
                 except CartItem.DoesNotExist:
                     return Response({'error': f"Cart item with ID {cart_item_id} not found for this user."}, status=404)
             else:

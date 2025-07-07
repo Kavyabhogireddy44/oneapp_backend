@@ -24,3 +24,8 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['id', 'user', 'items', 'created_at']
+
+    def get_items(self, obj):
+        filtered_items = obj.items.filter(quantity__gt=0)
+        serializer = CartItemSerializer(filtered_items, many=True)
+        return serializer.data
