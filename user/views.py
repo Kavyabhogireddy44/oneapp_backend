@@ -1,4 +1,5 @@
 from django.shortcuts import render
+
 from rest_framework import generics
 from .models import CustomUser
 from .serializers import UserSerializer
@@ -6,6 +7,21 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from login.utils import verify_jwt
+from django.http import JsonResponse
+from google.oauth2 import service_account
+import google.auth.transport.requests
+import os
+from django.conf import settings
+import json, requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import CustomUser as User  # Adjust the import based on your project structure
+from rest_framework.permissions import AllowAny
+
+
+
+
+
 
 class UserListCreateAPIView(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
@@ -17,6 +33,78 @@ class UserListCreateAPIView(generics.ListCreateAPIView):
 class UserUpdateAPIView(generics.UpdateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Path to JSON in same folder
+SERVICE_ACCOUNT_FILE = os.path.join(APP_DIR, "one_app.json")
+
+
+def get_firebase_token():
+
+    """Return Firebase access token string."""
+    SCOPES = [
+        "https://www.googleapis.com/auth/firebase.messaging"  # Required scope for sending FCM messages
+    ]
+    credentials = service_account.Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE, scopes=SCOPES
+    )
+    credentials.refresh(google.auth.transport.requests.Request())
+    return credentials.token
+
+
+class SendFCMToAllUsersAPIView(APIView):
+    permission_classes = [AllowAny]  # Optional: allow unauthenticated access for testing
+
+    def post(self, request):
+        try:
+            payload = request.data  # DRF parses JSON automatically
+            message = payload.get("message", {})
+            notification = message.get("notification", {})
+            data = message.get("data", {})
+            android = message.get("android", {})
+
+            # Collect all FCM tokens
+            # tokens = list(CustomUser.objects.exclude(fcm_token__isnull=True).values_list("fcm_token", flat=True))
+            tokens = ["cvX-ho_RSJ-g30sLv-WpSi:APA91bGky7m2dd6wf_pBbgIbOrUit_qeaSB32I-AZNw7ervyY6WYy9EHsTRZu4xNVmfC5wDRaLTP7wzE-W5FKO83JgZrNzQwn-BuF3Y4sCLmK-RvsJhstVI","cvX-ho_RSJ-g30sLv-WpSi:APA91bGky7m2dd6wf_pBbgIbOrUit_qeaSB32I-AZNw7ervyY6WYy9EHsTRZu4xNVmfC5wDRaLTP7wzE-W5FKO83JgZrNzQwn-BuF3Y4sCLmK-RvsJhstVI"]
+
+            if not tokens:
+                return Response({"error": "No FCM tokens found"}, status=status.HTTP_400_BAD_REQUEST)
+
+            access_token = get_firebase_token()
+            url = "https://fcm.googleapis.com/v1/projects/oneapp-74b5a/messages:send"
+            headers = {
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json; UTF-8",
+            }
+
+            results = []
+            for token in tokens:
+                fcm_payload = {
+                    "message": {
+                    "token": token,
+                    "notification": notification,
+                    "data": data,
+                    "android": android
+                    }
+                }
+                 
+                print("fcm_payload", fcm_payload)
+                response = requests.post(url, headers=headers, json=fcm_payload)
+                try:
+                    response_data = response.json()
+                except:
+                    response_data = response.text
+                results.append({
+                    "token": token,
+                    "status": response.status_code,
+                    "response": response_data
+                })
+
+            return Response({"results": results})
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class UserDestroyAPIView(generics.DestroyAPIView):
     queryset = CustomUser.objects.all()
