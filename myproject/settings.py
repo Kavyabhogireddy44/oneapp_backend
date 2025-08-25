@@ -14,6 +14,12 @@ from pathlib import Path
 import dj_database_url
 import os
 
+from decouple import config
+import firebase_admin
+from firebase_admin import credentials
+from google.oauth2 import service_account
+import google.auth.transport.requests
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -174,3 +180,25 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SECRET_KEY = config("SECRET_KEY")
+DEBUG = config("DEBUG", default=False, cast=bool)
+
+# Other secret text / API keys
+SECRET_TEXT = config("SECRET_TEXT")
+API_KEY = config("API_KEY")
+
+# --------------------------
+# Firebase Settings
+# --------------------------
+# Get Firebase JSON path from env variable
+firebase_cred_path = config("GOOGLE_APPLICATION_CREDENTIALS")
+
+# Full path to the JSON file (assumes relative to this settings.py)
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+SERVICE_ACCOUNT_FILE = os.path.join(APP_DIR, firebase_cred_path)
+
+# Initialize Firebase Admin SDK if not already initialized
+if firebase_cred_path and not firebase_admin._apps:
+    cred = credentials.Certificate(SERVICE_ACCOUNT_FILE)
+    firebase_admin.initialize_app(cred)

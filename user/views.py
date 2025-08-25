@@ -17,6 +17,24 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import CustomUser as User  # Adjust the import based on your project structure
 from rest_framework.permissions import AllowAny
+from google.auth.transport.requests import Request
+import os
+from google.oauth2 import service_account
+import google.auth.transport.requests
+from django.conf import settings
+
+def get_firebase_token():
+    """
+    Returns a Firebase access token for FCM messaging.
+    Works both locally and on Render.
+    """
+    SCOPES = ["https://www.googleapis.com/auth/firebase.messaging"]
+
+    credentials = service_account.Credentials.from_service_account_file(
+        settings.SERVICE_ACCOUNT_FILE, scopes=SCOPES
+    )
+    credentials.refresh(google.auth.transport.requests.Request())
+    return credentials.token
 
 
 
@@ -33,27 +51,29 @@ class UserListCreateAPIView(generics.ListCreateAPIView):
 class UserUpdateAPIView(generics.UpdateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-APP_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Path to JSON in same folder
-SERVICE_ACCOUNT_FILE = os.path.join(APP_DIR, "one_app.json")
+# APP_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# # Path to JSON in same folder
+# SERVICE_ACCOUNT_FILE = os.path.join(APP_DIR, "one_app.json")
 
 
-def get_firebase_token():
+# def get_firebase_token():
 
-    """Return Firebase access token string."""
-    SCOPES = [
-        "https://www.googleapis.com/auth/firebase.messaging"  # Required scope for sending FCM messages
-    ]
-    credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES
-    )
-    credentials.refresh(google.auth.transport.requests.Request())
-    return credentials.token
+#     """Return Firebase access token string."""
+#     SCOPES = [
+#         "https://www.googleapis.com/auth/firebase.messaging"  # Required scope for sending FCM messages
+#     ]
+#     credentials = service_account.Credentials.from_service_account_file(
+#         SERVICE_ACCOUNT_FILE, scopes=SCOPES
+#     )
+#     credentials.refresh(google.auth.transport.requests.Request())
+#     return credentials.token
 
 
 class SendFCMToAllUsersAPIView(APIView):
     permission_classes = [AllowAny]  # Optional: allow unauthenticated access for testing
+    print("inside send fcm to all users api view")
 
     def post(self, request):
         try:
@@ -62,23 +82,33 @@ class SendFCMToAllUsersAPIView(APIView):
             notification = message.get("notification", {})
             data = message.get("data", {})
             android = message.get("android", {})
+            print("payload", payload)
+            print("notification", notification)
+            print("data", data)
+            print("android", android)
+
 
             # Collect all FCM tokens
             # tokens = list(CustomUser.objects.exclude(fcm_token__isnull=True).values_list("fcm_token", flat=True))
             tokens = ["cvX-ho_RSJ-g30sLv-WpSi:APA91bGky7m2dd6wf_pBbgIbOrUit_qeaSB32I-AZNw7ervyY6WYy9EHsTRZu4xNVmfC5wDRaLTP7wzE-W5FKO83JgZrNzQwn-BuF3Y4sCLmK-RvsJhstVI","cvX-ho_RSJ-g30sLv-WpSi:APA91bGky7m2dd6wf_pBbgIbOrUit_qeaSB32I-AZNw7ervyY6WYy9EHsTRZu4xNVmfC5wDRaLTP7wzE-W5FKO83JgZrNzQwn-BuF3Y4sCLmK-RvsJhstVI"]
-
+            print("tokens", tokens)
             if not tokens:
                 return Response({"error": "No FCM tokens found"}, status=status.HTTP_400_BAD_REQUEST)
 
             access_token = get_firebase_token()
+            print("access_token", access_token)
             url = "https://fcm.googleapis.com/v1/projects/oneapp-74b5a/messages:send"
+            
             headers = {
                 "Authorization": f"Bearer {access_token}",
                 "Content-Type": "application/json; UTF-8",
             }
+            print("headers", headers)
+            print("inside try block")
 
             results = []
             for token in tokens:
+                print("token", token)
                 fcm_payload = {
                     "message": {
                     "token": token,
