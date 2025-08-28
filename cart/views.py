@@ -47,6 +47,52 @@ class ViewCartAPIView(APIView, GetUserFromTokenMixin):
                 filtered_data.append(cart_data)
 
         return Response(filtered_data, status=200)
+# class UpdateCartItemAPIView(APIView, GetUserFromTokenMixin):
+#     """
+#     Updates quantity for a cart item.
+#     """
+#     def post(self, request, *args, **kwargs):
+#         token = request.data.get('token')
+#         if not token:
+#             return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         user, error = self.get_user_from_token(token)
+#         if error:
+#             return error
+
+#         # Get or create cart
+#         cart, _ = Cart.objects.get_or_create(user=user)
+
+#         items_data = request.data.get('items', [])
+#         for item_data in items_data:
+#             cart_item_id = item_data.get("id")
+#             grocery_id = item_data.get("item")
+#             quantity = item_data.get("quantity", 1)
+
+#             try:
+#                 grocery_item = GroceryItem.objects.get(id=grocery_id)
+#             except GroceryItem.DoesNotExist:
+#                 return Response({'error': f"Grocery item {grocery_id} not found"}, status=404)
+
+#             if cart_item_id:
+#                 try:
+#                     cart_item = CartItem.objects.get(id=cart_item_id, cart=cart, item=grocery_item)
+#                     cart_item.quantity = quantity
+#                     cart_item.save()
+#                 except CartItem.DoesNotExist:
+#                     return Response({'error': f"Cart item with ID {cart_item_id} not found for this user."}, status=404)
+#             else:
+#                 # Check if item already exists in cart for safety
+#                 existing = CartItem.objects.filter(cart=cart, item=grocery_item).first()
+#                 if existing:
+#                     existing.quantity = quantity
+#                     existing.save()
+#                 else:
+#                     CartItem.objects.create(cart=cart, item=grocery_item, quantity=quantity)
+
+#         serializer = CartSerializer(cart)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+
 class UpdateCartItemAPIView(APIView, GetUserFromTokenMixin):
     """
     Updates quantity for a cart item.

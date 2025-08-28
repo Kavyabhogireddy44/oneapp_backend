@@ -89,8 +89,8 @@ class SendFCMToAllUsersAPIView(APIView):
 
 
             # Collect all FCM tokens
-            # tokens = list(CustomUser.objects.exclude(fcm_token__isnull=True).values_list("fcm_token", flat=True))
-            tokens = ["cvX-ho_RSJ-g30sLv-WpSi:APA91bGky7m2dd6wf_pBbgIbOrUit_qeaSB32I-AZNw7ervyY6WYy9EHsTRZu4xNVmfC5wDRaLTP7wzE-W5FKO83JgZrNzQwn-BuF3Y4sCLmK-RvsJhstVI","cvX-ho_RSJ-g30sLv-WpSi:APA91bGky7m2dd6wf_pBbgIbOrUit_qeaSB32I-AZNw7ervyY6WYy9EHsTRZu4xNVmfC5wDRaLTP7wzE-W5FKO83JgZrNzQwn-BuF3Y4sCLmK-RvsJhstVI"]
+            tokens = list(CustomUser.objects.exclude(fcm_token__isnull=True).values_list("fcm_token", flat=True))
+            # tokens = ["cvX-ho_RSJ-g30sLv-WpSi:APA91bGky7m2dd6wf_pBbgIbOrUit_qeaSB32I-AZNw7ervyY6WYy9EHsTRZu4xNVmfC5wDRaLTP7wzE-W5FKO83JgZrNzQwn-BuF3Y4sCLmK-RvsJhstVI","cvX-ho_RSJ-g30sLv-WpSi:APA91bGky7m2dd6wf_pBbgIbOrUit_qeaSB32I-AZNw7ervyY6WYy9EHsTRZu4xNVmfC5wDRaLTP7wzE-W5FKO83JgZrNzQwn-BuF3Y4sCLmK-RvsJhstVI"]
             print("tokens", tokens)
             if not tokens:
                 return Response({"error": "No FCM tokens found"}, status=status.HTTP_400_BAD_REQUEST)
