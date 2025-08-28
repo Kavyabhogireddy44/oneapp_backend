@@ -4,8 +4,8 @@ from user.models import CustomUser
 # Create your models here.
 class Suggestion(models.Model):
     user=models.ForeignKey(CustomUser,on_delete=models.CASCADE,related_name='suggestion', blank=True)
-    subject=models.CharField()
-    suggesion=models.CharField()
+    subject=models.CharField(max_length=20000, blank=True)
+    suggesion=models.CharField(max_length=20000, blank=True)
     user_name=models.CharField(max_length=200, blank=True)
     created_time=models.DateTimeField(auto_now_add=True)
     status=models.CharField(max_length=200,default='sent', blank=True)
