@@ -73,7 +73,7 @@ class AdminListAPIView(APIView):
         if not payload:
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
         
-        user_id = payload.get('user_id')
+        user_id = payload.get('Admin_user_id')
         role_id = payload.get('role')
         print("user_id", user_id)
         try:
@@ -97,7 +97,7 @@ class AdminDetailAPIView(APIView):
         payload = verify_admin_jwt(token)
         if not payload:
             return None, Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
-        user_id= payload.get('user_id')
+        user_id= payload.get('Admin_user_id')
         role_id = payload.get('role')
         print("role_id", role_id)
         try:
@@ -143,7 +143,7 @@ class AdminDeleteAPIView(APIView):
         payload = verify_admin_jwt(token)
         if not payload:
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
-        user_id = payload.get('user_id')
+        user_id = payload.get('Admin_user_id')
         role_id = payload.get('role')
         try:
             user = AdminUser.objects.get(id=user_id)
@@ -159,4 +159,33 @@ class AdminDeleteAPIView(APIView):
                 return Response({'error': 'You don\'t have permission to delete'}, status=status.HTTP_403_FORBIDDEN)
         except AdminUser.DoesNotExist:
             return Response({'error': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+# I need to get a details of particular admin user - 
+class AdminUserDetailAPIView(APIView):
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+        print("token", token)
+        print("request.data", request.data)
+        payload = verify_admin_jwt(token)
+        print("payload", payload)
+        if not payload:
+            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        user_id = payload.get('Admin_user_id')
+        print("user_id", user_id)
+        user = AdminUser.objects.get(id=user_id) 
+        serializer = AdminUserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK) 
+      
+
+ 
+
+
+       
+
+      
+
+
 

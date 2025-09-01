@@ -181,40 +181,40 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SECRET_KEY = config("SECRET_KEY")
-DEBUG = config("DEBUG", default=False, cast=bool)
+# SECRET_KEY = config("SECRET_KEY")
+# DEBUG = config("DEBUG", default=False, cast=bool)
 
-# Other secret text / API keys
-SECRET_TEXT = config("SECRET_TEXT")
-API_KEY = config("API_KEY")
+# # Other secret text / API keys
+# SECRET_TEXT = config("SECRET_TEXT")
+# API_KEY = config("API_KEY")
 
 # # --------------------------
 # # Firebase Settings
 # # --------------------------
 # # Get Firebase JSON path from env variable
-# firebase_cred_path = config("GOOGLE_APPLICATION_CREDENTIALS")
+firebase_cred_path = config("GOOGLE_APPLICATION_CREDENTIALS")
 
-# # Full path to the JSON file (assumes relative to this settings.py)
-# APP_DIR = os.path.dirname(os.path.abspath(__file__))
-# SERVICE_ACCOUNT_FILE = os.path.join(APP_DIR, firebase_cred_path)
+# Full path to the JSON file (assumes relative to this settings.py)
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+SERVICE_ACCOUNT_FILE = os.path.join(APP_DIR, firebase_cred_path)
 
-# # Initialize Firebase Admin SDK if not already initialized
-# if firebase_cred_path and not firebase_admin._apps:
-#     cred = credentials.Certificate(SERVICE_ACCOUNT_FILE)
-#     firebase_admin.initialize_app(cred)
-
-
-
-SERVICE_ACCOUNT_FILE = config(
-    "GOOGLE_APPLICATION_CREDENTIALS",
-    default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "one_app.json")
-)
-
-# Safety check
-if not os.path.exists(SERVICE_ACCOUNT_FILE):
-    raise FileNotFoundError(f"Firebase secret file not found: {SERVICE_ACCOUNT_FILE}")
-
-# Initialize Firebase if not already initialized
-if not firebase_admin._apps:
+# Initialize Firebase Admin SDK if not already initialized
+if firebase_cred_path and not firebase_admin._apps:
     cred = credentials.Certificate(SERVICE_ACCOUNT_FILE)
     firebase_admin.initialize_app(cred)
+
+
+
+# SERVICE_ACCOUNT_FILE = config(
+#     "GOOGLE_APPLICATION_CREDENTIALS",
+#     default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "one_app.json")
+# )
+
+# # Safety check
+# if not os.path.exists(SERVICE_ACCOUNT_FILE):
+#     raise FileNotFoundError(f"Firebase secret file not found: {SERVICE_ACCOUNT_FILE}")
+
+# # Initialize Firebase if not already initialized
+# if not firebase_admin._apps:
+#     cred = credentials.Certificate(SERVICE_ACCOUNT_FILE)
+#     firebase_admin.initialize_app(cred)

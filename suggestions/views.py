@@ -18,7 +18,7 @@ class SuggestionListCreateAPIView(generics.ListCreateAPIView):
         
         user_id = payload.get('user_id')
         try:
-            user = CustomUser.objects.get(id=user_id)
+            user = CustomUser.objects.get(id=user_id )
             return user, None
         except CustomUser.DoesNotExist:
             return None, Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)

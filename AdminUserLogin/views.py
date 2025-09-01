@@ -7,14 +7,15 @@ from AdminUser.models import AdminUser
 
 from AdminUser.serializers import AdminUserSerializer
 
-from .utils import create_admin_jwt, verify_admin_jwt
+# from .utils import create_admin_jwt, verify_admin_jwt
+from AdminUserLogin.utils import  verify_admin_jwt, create_admin_jwt
 
 
 class CreateTokenAPIView(APIView):
     def post(self, request):
         print("request.data", request.data)
         user_name = request.data.get('phone')
-
+        print("user_name", user_name)
         if not user_name:
             return Response({'error': 'user_name is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -32,15 +33,17 @@ class CreateTokenAPIView(APIView):
 class VerifyTokenAPIView(APIView):
     def post(self, request):
         token = request.data.get('token')
+        print("token", token)
         if not token:
             return Response({'error': 'Token is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         decoded = verify_admin_jwt(token)
+        print("decoded", decoded)
 
         if not decoded:
             return Response({'valid': False, 'error': 'Invalid or expired token.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        user_id = decoded.get('user_id')
+        user_id = decoded.get('Admin_user_id')
         if not user_id:
             return Response({'valid': False, 'error': 'Token does not contain user_id.'}, status=status.HTTP_400_BAD_REQUEST)
 
