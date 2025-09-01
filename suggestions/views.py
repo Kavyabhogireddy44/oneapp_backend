@@ -121,33 +121,33 @@ class SuggestionByTokenAPIView(APIView):
         suggestion.delete()
         return Response({'message': 'Address deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
-class UserSuggestionByTokenAPIView(APIView):
+# class UserSuggestionByTokenAPIView(APIView):
     
-    def post(self, request):
-        token = request.data.get('token')
-        if not token:
-            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+#     def post(self, request):
+#         token = request.data.get('token')
+#         if not token:
+#             return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        payload = verify_jwt(token)
-        print("payload", payload)
-        if not payload:
-            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+#         payload = verify_jwt(token)
+#         print("payload", payload)
+#         if not payload:
+#             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
         
-        user_id = payload.get('user_id')
-        print("user_id", user_id)
-        try:
-            user = CustomUser.objects.get(id=user_id)
-            user=user.id
-            print("user", user)
-        except CustomUser.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+#         user_id = payload.get('user_id')
+#         print("user_id", user_id)
+#         try:
+#             user = CustomUser.objects.get(id=user_id)
+#             user=user.id
+#             print("user", user)
+#         except CustomUser.DoesNotExist:
+#             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        suggestion = Suggestion.objects.all()
+#         suggestion = Suggestion.objects.all()
   
-        if not suggestion.exists():
-            return Response({'message': 'No suggestions found for this user'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = SuggesionSerializer(suggestion, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+#         if not suggestion.exists():
+#             return Response({'message': 'No suggestions found for this user'}, status=status.HTTP_404_NOT_FOUND)
+#         serializer = SuggesionSerializer(suggestion, many=True)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class AdminSuggestionByTokenAPIView(APIView):
     
@@ -169,8 +169,7 @@ class AdminSuggestionByTokenAPIView(APIView):
         except AdminUser.DoesNotExist:
             return Response({"error": "Admin_User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        suggestion = Suggestion.objects.all()
-  
+        suggestion = Suggestion.objects.all()  
         if not suggestion.exists():
             return Response({'message': 'No suggestions found for this user'}, status=status.HTTP_404_NOT_FOUND)
         serializer = SuggesionSerializer(suggestion, many=True)
