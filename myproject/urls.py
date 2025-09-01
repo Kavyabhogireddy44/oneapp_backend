@@ -36,6 +36,7 @@ urlpatterns = [
     path('api/adminuserlogin/', include('AdminUserLogin.urls')),
     path('api/grocery/', include('grocery.urls')),
     path('api/cart/', include('cart.urls')),  # Include cart URLs
+    path('api/ticket/', include('ticket.urls')),  # Include ticket URLs
 
     
 ]
