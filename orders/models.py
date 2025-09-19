@@ -16,6 +16,12 @@ class Order(models.Model):
             ('in-progress', 'In Progress'),
             ('completed', 'Completed'),
             ('cancelled', 'Cancelled'),
+            ('over', 'Over'),
+            ('postponed', 'Postponed'),
+            ('active', 'Active'),
+            ('accepted', 'Accepted'),
+            ('confirmed', 'Confirmed'),
+            ('rejected', 'Rejected'),
         ],
         default='pending'
     )

@@ -64,7 +64,9 @@ INSTALLED_APPS = [
     'grocery',
     'cart',
     'ticket',
-    'cart.mixins',  # Ensure this is included if you have mixins in the
+    'cart.mixins',
+    'notifications',  # Ensure this is included if you have mixins in the
+
 ]
 
 MIDDLEWARE = [
@@ -191,7 +193,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # # --------------------------
 # Firebase Settings
-# # --------------------------
+# --------------------------
 # # Get Firebase JSON path from env variable
 # firebase_cred_path = config("GOOGLE_APPLICATION_CREDENTIALS")
 

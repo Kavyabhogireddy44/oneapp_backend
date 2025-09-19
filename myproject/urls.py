@@ -37,6 +37,7 @@ urlpatterns = [
     path('api/grocery/', include('grocery.urls')),
     path('api/cart/', include('cart.urls')),  # Include cart URLs
     path('api/ticket/', include('ticket.urls')),  # Include ticket URLs
+    path('api/notifications/', include('notifications.urls')),  # Include notifications URLs
 
     
 ]
